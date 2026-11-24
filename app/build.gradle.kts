@@ -7,12 +7,12 @@ plugins {
 }
 
 android {
-    namespace = "io.github.makadv.shushlist"
+    namespace = "io.github.makadv.mutebox"
     compileSdk = 36
 
     defaultConfig {
         // ID legato al proprio account GitHub: non rivendica domini di terzi.
-        applicationId = "io.github.makadv.shushlist"
+        applicationId = "io.github.makadv.mutebox"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

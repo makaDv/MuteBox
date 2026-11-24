@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "Shushlist"
+rootProject.name = "MuteBox"
 include(":app")

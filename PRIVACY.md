@@ -1,12 +1,12 @@
-# Informativa sulla privacy di Shushlist
+# Informativa sulla privacy di MuteBox
 
 Ultimo aggiornamento: 24 novembre 2026
 
-Shushlist è un'app open source che funziona **interamente sul tuo dispositivo**.
+MuteBox è un'app open source che funziona **interamente sul tuo dispositivo**.
 
 ## Quali dati usa
 
-- **Contenuto delle notifiche**: con il permesso "Accesso alle notifiche", Shushlist legge il titolo delle notifiche
+- **Contenuto delle notifiche**: con il permesso "Accesso alle notifiche", MuteBox legge il titolo delle notifiche
   in arrivo per capire da quale app, persona o gruppo provengono e decidere se far suonare l'avviso.
 - **Nomi dei mittenti visti di recente**: fino a 40 nomi per app, salvati per suggerirteli nelle impostazioni.
 - **Le tue impostazioni**: regole per app e persone, orario automatico, suono, volume e vibrazione.
@@ -14,14 +14,14 @@ Shushlist è un'app open source che funziona **interamente sul tuo dispositivo**
 
 ## Dove vanno i dati
 
-Da nessuna parte. Shushlist:
+Da nessuna parte. MuteBox:
 
 - **non** richiede il permesso di accesso a Internet, quindi non può inviare dati fuori dal telefono;
 - **non** contiene pubblicità, analytics, tracciamento o librerie di terze parti che raccolgono dati;
 - **non** vende né condivide dati con nessuno;
 - **esclude** i propri dati dal backup cloud di Android e dal trasferimento tra dispositivi.
 
-I dati restano nella memoria privata dell'app. Per cancellarli tutti: Impostazioni di Android, App, Shushlist,
+I dati restano nella memoria privata dell'app. Per cancellarli tutti: Impostazioni di Android, App, MuteBox,
 Spazio di archiviazione, "Cancella dati", oppure disinstalla l'app.
 
 ## Dati di terzi
