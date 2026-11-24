@@ -1,0 +1,58 @@
+package com.hushly.service
+
+import android.app.Notification
+import android.app.NotificationManager
+import android.content.ComponentName
+import android.service.notification.NotificationListenerService
+import android.service.notification.StatusBarNotification
+import com.hushly.dnd.DndController
+import com.hushly.domain.RuleMatcher
+import com.hushly.hushly
+
+class HushListenerService : NotificationListenerService() {
+
+    /** Ultimo contenuto visto per ogni notifica: WhatsApp ripubblica la stessa notifica senza nuovi messaggi. */
+    private val lastSignature = HashMap<String, String>()
+
+    override fun onNotificationPosted(sbn: StatusBarNotification) {
+        if (sbn.packageName == packageName) return
+        val n = sbn.notification
+        if (sbn.isOngoing) return
+        if (n.flags and Notification.FLAG_GROUP_SUMMARY != 0) return
+
+        val app = hushly
+        val info = SenderExtractor.extract(n)
+        app.rules.recordSeen(sbn.packageName, info.names)
+
+        if (!app.settings.current.active) return
+        if (isSilentChannel(sbn)) return
+
+        val rule = app.rules.ruleFor(sbn.packageName)
+        if (!RuleMatcher.isAllowed(rule, info.sender, info.conversation)) return
+
+        val text = n.extras.getCharSequence(Notification.EXTRA_TEXT)?.toString().orEmpty()
+        val signature = "${n.`when`}|$text"
+        if (lastSignature[sbn.key] == signature) return
+        if (lastSignature.size > 500) lastSignature.clear()
+        lastSignature[sbn.key] = signature
+
+        AlertPlayer.play(this, "${sbn.packageName}|${info.conversation ?: info.sender ?: sbn.key}")
+    }
+
+    /** Le notifiche su canali silenziosi (importanza bassa) non devono mai suonare. */
+    private fun isSilentChannel(sbn: StatusBarNotification): Boolean {
+        val ranking = Ranking()
+        val found = runCatching { currentRanking?.getRanking(sbn.key, ranking) == true }.getOrDefault(false)
+        if (!found) return false
+        val importance = ranking.importance
+        return importance != NotificationManager.IMPORTANCE_UNSPECIFIED &&
+            importance < NotificationManager.IMPORTANCE_DEFAULT
+    }
+
+    override fun onListenerDisconnected() {
+        super.onListenerDisconnected()
+        // Senza ascolto Hushly non può far suonare nulla: meglio togliere il silenzio che perdere notifiche importanti.
+        if (hushly.settings.current.active) DndController.deactivate(this)
+        requestRebind(ComponentName(this, HushListenerService::class.java))
+    }
+}
