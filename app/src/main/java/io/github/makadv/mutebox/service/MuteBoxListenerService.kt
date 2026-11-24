@@ -9,7 +9,7 @@ import io.github.makadv.mutebox.dnd.DndController
 import io.github.makadv.mutebox.domain.RuleMatcher
 import io.github.makadv.mutebox.mutebox
 
-class HushListenerService : NotificationListenerService() {
+class MuteBoxListenerService : NotificationListenerService() {
 
     /** Ultimo contenuto visto per ogni notifica: WhatsApp ripubblica la stessa notifica senza nuovi messaggi. */
     private val lastSignature = HashMap<String, String>()
@@ -53,6 +53,6 @@ class HushListenerService : NotificationListenerService() {
         super.onListenerDisconnected()
         // Senza ascolto MuteBox non può far suonare nulla: meglio togliere il silenzio che perdere notifiche importanti.
         if (mutebox.settings.current.active) DndController.deactivate(this)
-        requestRebind(ComponentName(this, HushListenerService::class.java))
+        requestRebind(ComponentName(this, MuteBoxListenerService::class.java))
     }
 }

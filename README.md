@@ -58,8 +58,8 @@ Se Android mostra "impostazione con limitazioni", apri *Info app*, menu ⋮, *Co
 Serve [Android Studio](https://developer.android.com/studio) (o un JDK 17+ con l'Android SDK).
 
 ```bash
-git clone https://github.com/makaDv/Hushly.git
-cd Hushly
+git clone https://github.com/makaDv/MuteBox.git
+cd MuteBox
 ./gradlew assembleDebug        # APK in app/build/outputs/apk/debug/
 ./gradlew testDebugUnitTest    # test unitari
 ```

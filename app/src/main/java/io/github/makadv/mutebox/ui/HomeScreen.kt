@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
-import io.github.makadv.mutebox.data.HushSettings
+import io.github.makadv.mutebox.data.MuteBoxSettings
 import io.github.makadv.mutebox.dnd.DndController
 import io.github.makadv.mutebox.domain.RuleMode
 import io.github.makadv.mutebox.domain.ScheduleMath
@@ -231,7 +231,7 @@ private fun RulesCard(allowedApps: Int, people: Int, onOpenApps: () -> Unit) {
 }
 
 @Composable
-private fun ScheduleCard(settings: HushSettings, context: Context) {
+private fun ScheduleCard(settings: MuteBoxSettings, context: Context) {
     val store = context.mutebox.settings
     fun pickTime(initial: Int, onPicked: (Int) -> Unit) {
         TimePickerDialog(context, { _, h, m -> onPicked(h * 60 + m) }, initial / 60, initial % 60, true).show()
@@ -270,7 +270,7 @@ private fun ScheduleCard(settings: HushSettings, context: Context) {
 }
 
 @Composable
-private fun SoundCard(settings: HushSettings, context: Context, onPickSound: () -> Unit) {
+private fun SoundCard(settings: MuteBoxSettings, context: Context, onPickSound: () -> Unit) {
     val store = context.mutebox.settings
     val soundName = remember(settings.soundUri) {
         settings.soundUri?.let { runCatching { RingtoneManager.getRingtone(context, Uri.parse(it))?.getTitle(context) }.getOrNull() }

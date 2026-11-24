@@ -12,7 +12,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.github.makadv.mutebox.R
-import io.github.makadv.mutebox.schedule.HushReceiver
+import io.github.makadv.mutebox.schedule.MuteBoxReceiver
 import io.github.makadv.mutebox.ui.MainActivity
 
 /** Notifica fissa mostrata mentre MuteBox è attivo, con il pulsante "Disattiva". */
@@ -41,11 +41,11 @@ object StatusNotification {
         )
         val stop = PendingIntent.getBroadcast(
             context, 1,
-            Intent(context, HushReceiver::class.java).setAction(HushReceiver.ACTION_STOP),
+            Intent(context, MuteBoxReceiver::class.java).setAction(MuteBoxReceiver.ACTION_STOP),
             PendingIntent.FLAG_IMMUTABLE,
         )
         val notification = NotificationCompat.Builder(context, CHANNEL)
-            .setSmallIcon(R.drawable.ic_hush)
+            .setSmallIcon(R.drawable.ic_mutebox)
             .setContentTitle("MuteBox attivo")
             .setContentText("Suonano solo le notifiche che hai scelto")
             .setOngoing(true)

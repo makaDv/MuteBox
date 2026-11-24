@@ -19,13 +19,13 @@ object ScheduleManager {
     /** Cancella e riprogramma gli allarmi di inizio e fine fascia. */
     fun reschedule(context: Context) {
         val am = context.getSystemService(AlarmManager::class.java)
-        am.cancel(pending(context, REQ_START, HushReceiver.ACTION_SCHEDULE_START))
-        am.cancel(pending(context, REQ_END, HushReceiver.ACTION_SCHEDULE_END))
+        am.cancel(pending(context, REQ_START, MuteBoxReceiver.ACTION_SCHEDULE_START))
+        am.cancel(pending(context, REQ_END, MuteBoxReceiver.ACTION_SCHEDULE_END))
         val s = context.mutebox.settings.current
         if (!s.scheduleEnabled || s.startMinutes == s.endMinutes) return
         val now = LocalDateTime.now()
-        set(context, am, REQ_START, HushReceiver.ACTION_SCHEDULE_START, ScheduleMath.nextOccurrence(now, s.startMinutes))
-        set(context, am, REQ_END, HushReceiver.ACTION_SCHEDULE_END, ScheduleMath.nextOccurrence(now, s.endMinutes))
+        set(context, am, REQ_START, MuteBoxReceiver.ACTION_SCHEDULE_START, ScheduleMath.nextOccurrence(now, s.startMinutes))
+        set(context, am, REQ_END, MuteBoxReceiver.ACTION_SCHEDULE_END, ScheduleMath.nextOccurrence(now, s.endMinutes))
     }
 
     fun isNowInWindow(context: Context): Boolean {
@@ -58,7 +58,7 @@ object ScheduleManager {
     private fun pending(context: Context, req: Int, action: String): PendingIntent =
         PendingIntent.getBroadcast(
             context, req,
-            Intent(context, HushReceiver::class.java).setAction(action),
+            Intent(context, MuteBoxReceiver::class.java).setAction(action),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
 }

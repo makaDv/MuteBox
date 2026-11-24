@@ -6,7 +6,7 @@ import android.content.Intent
 import io.github.makadv.mutebox.dnd.DndController
 
 /** Azioni interne: inizio/fine fascia oraria e pulsante "Disattiva" della notifica. */
-class HushReceiver : BroadcastReceiver() {
+class MuteBoxReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             ACTION_STOP -> DndController.deactivate(context)

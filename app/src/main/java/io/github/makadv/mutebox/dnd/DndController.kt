@@ -44,7 +44,7 @@ object DndController {
 
     private fun refreshTile(context: Context) {
         runCatching {
-            TileService.requestListeningState(context, ComponentName(context, HushTileService::class.java))
+            TileService.requestListeningState(context, ComponentName(context, MuteBoxTileService::class.java))
         }
     }
 }

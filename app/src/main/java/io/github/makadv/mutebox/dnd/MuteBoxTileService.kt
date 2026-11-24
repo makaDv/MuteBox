@@ -9,7 +9,7 @@ import io.github.makadv.mutebox.mutebox
 import io.github.makadv.mutebox.ui.MainActivity
 
 /** Riquadro nelle Impostazioni rapide per accendere e spegnere MuteBox. */
-class HushTileService : TileService() {
+class MuteBoxTileService : TileService() {
 
     override fun onStartListening() {
         super.onStartListening()
