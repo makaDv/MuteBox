@@ -7,12 +7,12 @@ plugins {
 }
 
 android {
-    namespace = "com.hushly"
+    namespace = "io.github.makadv.shushlist"
     compileSdk = 36
 
     defaultConfig {
         // ID legato al proprio account GitHub: non rivendica domini di terzi.
-        applicationId = "io.github.makadv.hushly"
+        applicationId = "io.github.makadv.shushlist"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
