@@ -10,6 +10,22 @@ il telefono resta muto, ma se ti scrive la mamma, il partner o il gruppo "Famigl
 > Android o il produttore del telefono possono chiuderla o limitarla. **Non usarla per avvisi da cui
 > dipendono salute, sicurezza o emergenze.** Leggi la sezione [Esclusione di responsabilità](#esclusione-di-responsabilità).
 
+## Scarica e installa
+
+1. Dal telefono apri l'ultima versione nella pagina [Releases](https://github.com/makaDv/MuteBox/releases/latest).
+2. Scarica il file `MuteBox-vX.Y.apk`.
+3. Aprilo e, se Android lo chiede, consenti l'installazione da questa fonte (*Installa app sconosciute*).
+4. Avvia MuteBox e segui la guida ai permessi.
+
+Gli APK ufficiali sono firmati con questo certificato (SHA-256):
+
+```
+24:FA:47:56:EC:A4:51:FC:DD:3C:3D:03:F6:47:63:1A:81:89:8D:B9:FF:48:A5:C1:36:0C:B3:62:D5:B1:A2:C5
+```
+
+Puoi controllarlo con `apksigner verify --print-certs MuteBox-vX.Y.apk`.
+Non installare APK di MuteBox presi da altri siti: potrebbero essere modificati.
+
 ## Funzioni
 
 - **Interruttore unico**: accendi MuteBox dall'app, dal riquadro nelle Impostazioni rapide o spegnilo dalla notifica.
