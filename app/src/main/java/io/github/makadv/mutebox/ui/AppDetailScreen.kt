@@ -108,7 +108,8 @@ fun AppDetailScreen(packageName: String, label: String, onBack: () -> Unit) {
                 if (suggestions.isEmpty()) {
                     item {
                         Text(
-                            "Quando arrivano notifiche da questa app, qui compaiono i nomi da aggiungere con un tocco.",
+                            "Da ora, quando arrivano notifiche da questa app, qui compaiono i nomi da aggiungere con un tocco. " +
+                                "Restano salvati sul telefono per 30 giorni, poi si cancellano da soli.",
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }

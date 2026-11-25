@@ -7,6 +7,7 @@ import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import io.github.makadv.mutebox.dnd.DndController
 import io.github.makadv.mutebox.domain.RuleMatcher
+import io.github.makadv.mutebox.domain.RuleMode
 import io.github.makadv.mutebox.mutebox
 
 class MuteBoxListenerService : NotificationListenerService() {
@@ -21,17 +22,22 @@ class MuteBoxListenerService : NotificationListenerService() {
         if (n.flags and Notification.FLAG_GROUP_SUMMARY != 0) return
 
         val app = mutebox
+        val rule = app.rules.ruleFor(sbn.packageName)
+        // Minimizzazione: nessun dato letto o salvato per le app senza regole (banca, salute, ecc.).
+        if (rule == null || rule.mode == RuleMode.OFF) return
+
         val info = SenderExtractor.extract(n)
-        app.rules.recordSeen(sbn.packageName, info.names)
+        // I nomi si ricordano solo dove servono a scegliere le persone.
+        if (rule.mode == RuleMode.SOME) app.rules.recordSeen(sbn.packageName, info.names)
 
         if (!app.settings.current.active) return
         if (isSilentChannel(sbn)) return
 
-        val rule = app.rules.ruleFor(sbn.packageName)
         if (!RuleMatcher.isAllowed(rule, info.sender, info.conversation)) return
 
-        val text = n.extras.getCharSequence(Notification.EXTRA_TEXT)?.toString().orEmpty()
-        val signature = "${n.`when`}|$text"
+        // Del testo resta in memoria solo un hash, per riconoscere le ripubblicazioni identiche.
+        val textHash = n.extras.getCharSequence(Notification.EXTRA_TEXT)?.toString().orEmpty().hashCode()
+        val signature = "${n.`when`}|$textHash"
         if (lastSignature[sbn.key] == signature) return
         if (lastSignature.size > 500) lastSignature.clear()
         lastSignature[sbn.key] = signature

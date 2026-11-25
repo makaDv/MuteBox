@@ -17,6 +17,8 @@ data class MuteBoxSettings(
     val soundUri: String? = null,
     val volume: Int = 80,
     val vibrate: Boolean = true,
+    /** L'utente ha letto e accettato l'informativa prima di concedere l'accesso alle notifiche. */
+    val privacyAccepted: Boolean = false,
 )
 
 class SettingsStore(context: Context) {
@@ -32,6 +34,15 @@ class SettingsStore(context: Context) {
         _state.value = next
     }
 
+    /** Torna alle impostazioni predefinite. Tiene solo l'accettazione dell'informativa. */
+    @Synchronized
+    fun reset() {
+        val next = MuteBoxSettings(privacyAccepted = _state.value.privacyAccepted)
+        prefs.edit().clear().commit()
+        save(next)
+        _state.value = next
+    }
+
     private fun load(): MuteBoxSettings {
         val d = MuteBoxSettings()
         return MuteBoxSettings(
@@ -43,6 +54,7 @@ class SettingsStore(context: Context) {
             soundUri = prefs.getString("soundUri", d.soundUri),
             volume = prefs.getInt("volume", d.volume),
             vibrate = prefs.getBoolean("vibrate", d.vibrate),
+            privacyAccepted = prefs.getBoolean("privacyAccepted", d.privacyAccepted),
         )
     }
 
@@ -57,6 +69,7 @@ class SettingsStore(context: Context) {
             .putString("soundUri", s.soundUri)
             .putInt("volume", s.volume)
             .putBoolean("vibrate", s.vibrate)
+            .putBoolean("privacyAccepted", s.privacyAccepted)
             .commit()
     }
 }

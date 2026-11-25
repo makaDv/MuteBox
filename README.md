@@ -113,7 +113,16 @@ Tecnologie: Kotlin, Jetpack Compose, Material 3, Coroutines/StateFlow. Nessuna d
 ## Privacy
 
 Tutto avviene sul dispositivo. MuteBox non ha il permesso Internet, non raccoglie, non invia e non vende dati,
-ed esclude i propri dati dal backup cloud. Dettagli in [PRIVACY.md](PRIVACY.md).
+ed esclude i propri dati dal backup cloud. È progettata secondo i principi di privacy by design del GDPR:
+
+- **informativa al primo avvio**, prima di chiedere l'accesso alle notifiche;
+- **minimizzazione**: le notifiche delle app senza regole (banca, salute, ecc.) vengono ignorate subito;
+  i nomi dei mittenti si salvano solo per le app in modalità "Solo alcune persone";
+- **conservazione limitata**: i nomi visti si cancellano da soli dopo 30 giorni;
+  il testo dei messaggi non viene mai salvato;
+- **controllo dall'app**: esporta i tuoi dati in JSON, cancella i nomi visti o tutti i dati, revoca il permesso.
+
+Dettagli in [PRIVACY.md](PRIVACY.md).
 
 ## Contribuire
 

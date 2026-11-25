@@ -8,6 +8,7 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -55,10 +57,11 @@ import io.github.makadv.mutebox.domain.ScheduleMath
 import io.github.makadv.mutebox.mutebox
 import io.github.makadv.mutebox.schedule.ScheduleManager
 import io.github.makadv.mutebox.service.AlertPlayer
+import org.json.JSONObject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(onOpenApps: () -> Unit) {
+fun HomeScreen(onOpenApps: () -> Unit, onOpenPrivacy: () -> Unit) {
     val context = LocalContext.current
     val app = context.mutebox
     val settings by app.settings.state.collectAsState()
@@ -76,6 +79,15 @@ fun HomeScreen(onOpenApps: () -> Unit) {
                 IntentCompat.getParcelableExtra(it, RingtoneManager.EXTRA_RINGTONE_PICKED_URI, Uri::class.java)
             }
             app.settings.update { it.copy(soundUri = uri?.toString()) }
+        }
+    }
+    val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        if (uri != null) {
+            val ok = runCatching {
+                context.contentResolver.openOutputStream(uri)?.use { it.write(exportData(context).toByteArray()) }
+                    ?: error("stream nullo")
+            }.isSuccess
+            Toast.makeText(context, if (ok) "Dati esportati" else "Esportazione non riuscita", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -106,12 +118,84 @@ fun HomeScreen(onOpenApps: () -> Unit) {
                     .putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, settings.soundUri?.let(Uri::parse))
                 ringtoneLauncher.launch(intent)
             }
+            PrivacyDataCard(
+                onOpenPrivacy = onOpenPrivacy,
+                onExport = { exportLauncher.launch("mutebox-dati.json") },
+            )
             DisclaimerCard()
         }
     }
 }
 
-/** Avviso d'uso: l'app non dà garanzie e i dati restano sul telefono. */
+/** Tutti i dati salvati dall'app, per il diritto di accesso e portabilità (artt. 15 e 20 GDPR). */
+private fun exportData(context: Context): String {
+    val app = context.mutebox
+    val s = app.settings.current
+    val settings = JSONObject()
+        .put("active", s.active)
+        .put("scheduleEnabled", s.scheduleEnabled)
+        .put("start", ScheduleMath.format(s.startMinutes))
+        .put("end", ScheduleMath.format(s.endMinutes))
+        .put("soundUri", s.soundUri ?: JSONObject.NULL)
+        .put("volume", s.volume)
+        .put("vibrate", s.vibrate)
+        .put("privacyAccepted", s.privacyAccepted)
+    return app.rules.exportJson()
+        .put("app", "MuteBox")
+        .put("exportedAt", java.time.OffsetDateTime.now().toString())
+        .put("settings", settings)
+        .toString(2)
+}
+
+/** Diritti sui dati: rileggere l'informativa, esportare, cancellare (artt. 13, 15, 17, 20 GDPR). */
+@Composable
+private fun PrivacyDataCard(onOpenPrivacy: () -> Unit, onExport: () -> Unit) {
+    val context = LocalContext.current
+    val app = context.mutebox
+    var confirmDeleteAll by remember { mutableStateOf(false) }
+    Card {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Privacy e dati", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Tutto resta sul telefono: niente Internet, niente backup cloud. " +
+                    "I nomi visti nelle notifiche si cancellano da soli dopo 30 giorni.",
+                style = MaterialTheme.typography.bodySmall,
+            )
+            OutlinedButton(onClick = onOpenPrivacy, modifier = Modifier.fillMaxWidth()) { Text("Leggi l'informativa") }
+            OutlinedButton(onClick = onExport, modifier = Modifier.fillMaxWidth()) { Text("Esporta i miei dati") }
+            OutlinedButton(onClick = {
+                app.rules.clearSeen()
+                Toast.makeText(context, "Nomi visti cancellati", Toast.LENGTH_SHORT).show()
+            }, modifier = Modifier.fillMaxWidth()) { Text("Cancella i nomi visti") }
+            OutlinedButton(onClick = { confirmDeleteAll = true }, modifier = Modifier.fillMaxWidth()) {
+                Text("Cancella tutti i dati", color = MaterialTheme.colorScheme.error)
+            }
+            TextButton(onClick = { context.startActivity(Permissions.listenerSettings()) }) {
+                Text("Revoca l'accesso alle notifiche")
+            }
+        }
+    }
+    if (confirmDeleteAll) {
+        AlertDialog(
+            onDismissRequest = { confirmDeleteAll = false },
+            title = { Text("Cancellare tutti i dati?") },
+            text = { Text("Regole, persone scelte, nomi visti e impostazioni verranno eliminati. MuteBox verrà spento. L'operazione non si può annullare.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmDeleteAll = false
+                    DndController.deactivate(context)
+                    app.rules.clearAll()
+                    app.settings.reset()
+                    ScheduleManager.reschedule(context)
+                    Toast.makeText(context, "Dati cancellati", Toast.LENGTH_SHORT).show()
+                }) { Text("Cancella", color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = { TextButton(onClick = { confirmDeleteAll = false }) { Text("Annulla") } },
+        )
+    }
+}
+
+/** Avviso d'uso: l'app non dà garanzie. */
 @Composable
 private fun DisclaimerCard() {
     Card {
@@ -121,11 +205,6 @@ private fun DisclaimerCard() {
                 "MuteBox è un progetto open source gratuito, fornito \"così com'è\", senza alcuna garanzia. " +
                     "Android o il produttore del telefono possono chiuderla o bloccarla: non usarla per " +
                     "avvisi da cui dipendono salute, sicurezza o emergenze.",
-                style = MaterialTheme.typography.bodySmall,
-            )
-            Text(
-                "Privacy: le notifiche sono lette solo sul dispositivo. MuteBox non ha accesso a Internet " +
-                    "e non invia, vende o condivide alcun dato.",
                 style = MaterialTheme.typography.bodySmall,
             )
             Text(
@@ -143,6 +222,13 @@ private fun PermissionsCard(perms: PermState, onRequestNotifications: () -> Unit
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("Permessi da concedere", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            if (!perms.listener) {
+                Text(
+                    "Android avviserà che l'app può leggere le notifiche: è l'avviso standard per questo permesso. " +
+                        "MuteBox legge solo mittente e conversazione delle app a cui dai una regola e non invia nulla fuori dal telefono.",
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
             PermRow("Accesso alle notifiche (obbligatorio)", perms.listener) {
                 context.startActivity(Permissions.listenerSettings())
             }
