@@ -15,8 +15,8 @@ android {
         applicationId = "io.github.makadv.mutebox"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
     }
 
     // Firma release opzionale: crea keystore.properties (escluso da git) con

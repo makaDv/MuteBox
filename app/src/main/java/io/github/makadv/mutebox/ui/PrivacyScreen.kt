@@ -3,8 +3,8 @@ package io.github.makadv.mutebox.ui
 import android.app.Activity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 /**
@@ -92,9 +93,14 @@ fun PrivacyScreen(onAccept: (() -> Unit)?, onBack: () -> Unit) {
                 style = MaterialTheme.typography.bodySmall,
             )
             if (onAccept != null) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = { (context as? Activity)?.finish() }, Modifier.weight(1f)) { Text("Esci") }
-                    Button(onClick = onAccept, Modifier.weight(1f)) { Text("Accetto e continuo") }
+                // Uno sotto l'altro e a tutta larghezza: affiancati, con caratteri grandi il testo va a capo.
+                Column(Modifier.fillMaxWidth().padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = onAccept, Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                        Text("Accetto e continuo", textAlign = TextAlign.Center)
+                    }
+                    OutlinedButton(onClick = { (context as? Activity)?.finish() }, Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                        Text("Esci", textAlign = TextAlign.Center)
+                    }
                 }
             }
         }
